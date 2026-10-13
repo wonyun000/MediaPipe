@@ -5,28 +5,32 @@ import cv2
 import mediapipe as mp
 
 # =========================================
-# 🧩 Mediapipe 얼굴 감지(Face Detection) 초기화
+# 🧩 Mediapipe 얼굴 감지 초기화 (손에서 얼굴로 변경)
 # =========================================
 mp_face_detection = mp.solutions.face_detection
 mp_drawing = mp.solutions.drawing_utils
 
-# 얼굴 검출기 설정 (min_detection_confidence: 탐지 신뢰도)
 face_detection = mp_face_detection.FaceDetection(
     min_detection_confidence=0.5
 )
 
 # =========================================
-# 📸 비디오(또는 카메라) 연결
+# 📸 동영상 스트림 연결 (웹캠 또는 로컬 동영상 파일)
 # =========================================
-# cap = cv2.VideoCapture(0)            # 기본 카메라 사용 시
-cap = cv2.VideoCapture(r"C:\Users\HKNU\Desktop\MediaPipe\face.mp4")   # 동영상 파일 사용 시
+# 웹캠을 쓰시려면 0, 로컬 파일(face.mp4 등)을 쓰시려면 파일명을 넣어주세요
+# 'face.mp4' 파일로 연결
+cap = cv2.VideoCapture("face.mp4")
+
+if not cap.isOpened():
+    print("❌ 영상을 열 수 없습니다.")
+    exit()
 
 print("📷 얼굴 감지 스트림 시작 — ESC를 눌러 종료합니다.")
 
 while cap.isOpened():
     success, image = cap.read()
     if not success:
-        print("⚠️ 프레임을 읽지 못했습니다. 파일이나 카메라 연결을 확인하세요.")
+        print("⚠️ 프레임을 읽지 못했습니다. 스트림을 종료합니다.")
         break
 
     # 좌우 반전 (셀카 뷰)
@@ -38,13 +42,13 @@ while cap.isOpened():
     # 얼굴 검출 수행
     result = face_detection.process(image_rgb)
 
-    # 👤 얼굴 랜드마크 및 바운딩 박스 표시
+    # 👤 얼굴 감지 결과 표시 (손 랜드마크 대신 얼굴 감지 박스 표시)
     if result.detections:
         for detection in result.detections:
             mp_drawing.draw_detection(image, detection)
 
     # 화면 표시
-    cv2.imshow('🤖 MediaPipe Face Detector', image)
+    cv2.imshow('🤖 Face Detector', image)
 
     # ESC 키로 종료
     if cv2.waitKey(5) & 0xFF == 27:

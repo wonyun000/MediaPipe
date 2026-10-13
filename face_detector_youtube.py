@@ -6,18 +6,29 @@ import mediapipe as mp
 import yt_dlp
 
 # =========================================
-# 🔗 YouTube 동영상 스트림 주소 추출 함수
+# 🔗 YouTube 동영상 스트림 주소 추출 함수 (포맷 오류 방지 최적화)
 # =========================================
 def get_youtube_stream(url):
     ydl_opts = {
-        'format': 'best[ext=mp4]/best', # mp4 형식 중 가장 좋은 화질 선택
+        'format': 'bv*+ba/b',  # 가장 확실한 조합형 포맷 또는 기본 포맷 선택
+        'noplaylist': True,
+        'quiet': True,
+        'no_warnings': True,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
-        return info['url']
+        
+        # 만약 포맷이 여러 개 분리되어 있다면 첫 번째 비디오 URL 사용
+        if 'url' in info:
+            return info['url']
+        elif 'formats' in info and len(info['formats']) > 0:
+            for f in reversed(info['formats']):
+                if f.get('url'):
+                    return f['url']
+        return info['entries'][0]['url']
 
-# 📺 테스트할 유튜브 영상 링크 입력 (원하는 얼굴 감지 유튜브 영상 주소로 변경 가능)
-youtube_url = 'https://www.youtube.com/watch?v=JRRyYyiiuJQ'
+# 📺 테스트할 유튜브 영상 링크 입력
+youtube_url = 'https://www.youtube.com/shorts/jZjGsZmVVSI?feature=share'
 
 print("⏳ 유튜브 영상 스트리밍 주소 추출 중...")
 video_stream_url = get_youtube_stream(youtube_url)

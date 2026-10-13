@@ -17,7 +17,7 @@ def get_youtube_stream(url):
         return info['url']
 
 # 📺 테스트할 유튜브 영상 링크 입력 (원하는 손 감지 유튜브 영상 주소로 변경 가능)
-youtube_url = 'https://www.youtube.com/watch?v=https://youtu.be/JRRyYyiiuJQ'
+youtube_url = 'https://www.youtube.com/watch?v=JRRyYyiiuJQ'
 
 print("⏳ 유튜브 영상 스트리밍 주소 추출 중...")
 video_stream_url = get_youtube_stream(youtube_url)
